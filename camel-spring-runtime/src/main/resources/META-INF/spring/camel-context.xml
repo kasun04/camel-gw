@@ -13,29 +13,47 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
---><!-- Configures the Camel Context--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+--><!-- Configures the Camel Context-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-  <camelContext xmlns="http://camel.apache.org/schema/spring">
-    <package>org.kasun.gw</package>
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+        <package>org.kasun.gw</package>
 
-    <!--<route id="Jetty_Sample">-->
+        <!--<route id="Jetty_Sample">-->
         <!--<from uri="jetty:http://localhost:8888/myBookService"/>-->
         <!--<log logName="HTTP LOG" loggingLevel="INFO" message="HTTP REQUEST: ${in.header.bookid}"/>-->
         <!--<process ref="myBookService"/>-->
-    <!--</route>-->
+        <!--</route>-->
 
-      <route id="http-route-one">
-          <from uri="netty4-http:http://localhost:6060/one?matchOnUriPrefix=true"/>
-          <log message="Request Message : ${body}"/>
-          <transform>
-              <simple>Response from Camel one on route ${routeId} using thread: ${threadName}</simple>
-          </transform>
+        <!--<route id="http-route-one">-->
+        <!--<from uri="netty4-http:http://localhost:6060/one?matchOnUriPrefix=true"/>-->
+        <!--<log message="Request Message : ${body}"/>-->
+        <!--<delay>-->
+        <!--<constant>1000</constant>-->
+        <!--</delay>-->
+        <!--<transform>-->
+        <!--<simple>Response from Camel one on route ${routeId} using thread: ${threadName}</simple>-->
+        <!--</transform>-->
+        <!--</route>-->
 
 
-      </route>
-</camelContext>
+        <!-- Virtual Service -->
+        <route id="http-route-finance">
+            <from uri="netty4-http:http://localhost:6060/FinanceService"/>
+            <to uri="http://localhost:9000/services/SimpleStockQuoteService?bridgeEndpoint=true"/>
+        </route>
+
+        <route id="http-route-hr">
+            <from uri="netty4-http:http://localhost:6060/HRService"/>
+            <log message="Request Message : ${body}"/>
+        </route>
+
+    </camelContext>
 
 
-<bean class="org.kasun.gw.MyBookService" id="myBookService"/>
+    <bean class="org.kasun.gw.MyBookService" id="myBookService"/>
 
 </beans>
